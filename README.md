@@ -22,11 +22,34 @@ We employ a Gauntlet-style simulation framework:
     *   **Dynamic Triggers:** Modeling a "Gas-Aware" Stop-Loss that adjusts the trigger LTV based on real-time network congestion and slippage estimates.
 4.  **Backtesting:** Comparing "Capital Saved" vs. "Liquidation Occurred" for both strategies.
 
-## Project Structure
-*   `data/`: Historical price and gas data (CSV/JSON).
-*   `scripts/`: Python models for simulation and backtesting.
-*   `notebooks/`: Exploratory Data Analysis (EDA) and visualization.
-*   `reports/`: Final Consulting PDF and executive summary.
-
 ## How to Run
-(Instructions to follow as scripts are developed)
+
+### 1. Prerequisites
+Ensure you have Python 3.10+ installed. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+### 2. Running Simulations
+You can run a single backtest with custom parameters:
+```bash
+python3 scripts/risk_model.py --ltv 0.75 --buffer 0.05 --protocol AaveV3
+```
+
+To run a full **Parameter Sweep** (testing multiple LTV/Buffer combinations) and generate a results CSV:
+```bash
+python3 scripts/risk_model.py --sweep --protocol AaveV3
+```
+
+### 3. Analysis Notebook
+For visual analysis, heatmaps, and LTV trajectories, open the Jupyter notebook:
+```bash
+jupyter notebook notebooks/aug5_analysis.ipynb
+```
+
+## Project Structure
+*   `data/`: Historical price and gas data for Aug 5, 2024.
+*   `scripts/risk_model.py`: Core simulation engine with slippage and protocol logic.
+*   `notebooks/`: Data visualization and crash analysis.
+*   `reports/`: Backtest summaries and sweep results CSV.
+*   `tests/`: Unit tests for risk logic.
