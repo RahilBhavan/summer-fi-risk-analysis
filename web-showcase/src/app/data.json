@@ -1,0 +1,122 @@
+[
+  {
+    "Hour_UTC": "00:00",
+    "Price_USD": 2910,
+    "Gas_Gwei": 14.2
+  },
+  {
+    "Hour_UTC": "01:00",
+    "Price_USD": 2850,
+    "Gas_Gwei": 16.5
+  },
+  {
+    "Hour_UTC": "02:00",
+    "Price_USD": 2780,
+    "Gas_Gwei": 18.8
+  },
+  {
+    "Hour_UTC": "03:00",
+    "Price_USD": 2690,
+    "Gas_Gwei": 22.4
+  },
+  {
+    "Hour_UTC": "04:00",
+    "Price_USD": 2450,
+    "Gas_Gwei": 35.1
+  },
+  {
+    "Hour_UTC": "05:00",
+    "Price_USD": 2280,
+    "Gas_Gwei": 78.6
+  },
+  {
+    "Hour_UTC": "06:00",
+    "Price_USD": 2120,
+    "Gas_Gwei": 144.2
+  },
+  {
+    "Hour_UTC": "07:00",
+    "Price_USD": 2310,
+    "Gas_Gwei": 385.0
+  },
+  {
+    "Hour_UTC": "08:00",
+    "Price_USD": 2380,
+    "Gas_Gwei": 681.4
+  },
+  {
+    "Hour_UTC": "09:00",
+    "Price_USD": 2420,
+    "Gas_Gwei": 420.5
+  },
+  {
+    "Hour_UTC": "10:00",
+    "Price_USD": 2450,
+    "Gas_Gwei": 275.3
+  },
+  {
+    "Hour_UTC": "11:00",
+    "Price_USD": 2420,
+    "Gas_Gwei": 188.9
+  },
+  {
+    "Hour_UTC": "12:00",
+    "Price_USD": 2390,
+    "Gas_Gwei": 142.1
+  },
+  {
+    "Hour_UTC": "13:00",
+    "Price_USD": 2400,
+    "Gas_Gwei": 115.4
+  },
+  {
+    "Hour_UTC": "14:00",
+    "Price_USD": 2410,
+    "Gas_Gwei": 94.2
+  },
+  {
+    "Hour_UTC": "15:00",
+    "Price_USD": 2420,
+    "Gas_Gwei": 76.8
+  },
+  {
+    "Hour_UTC": "16:00",
+    "Price_USD": 2440,
+    "Gas_Gwei": 62.5
+  },
+  {
+    "Hour_UTC": "17:00",
+    "Price_USD": 2450,
+    "Gas_Gwei": 54.1
+  },
+  {
+    "Hour_UTC": "18:00",
+    "Price_USD": 2460,
+    "Gas_Gwei": 48.3
+  },
+  {
+    "Hour_UTC": "19:00",
+    "Price_USD": 2440,
+    "Gas_Gwei": 42.7
+  },
+  {
+    "Hour_UTC": "20:00",
+    "Price_USD": 2430,
+    "Gas_Gwei": 38.1
+  },
+  {
+    "Hour_UTC": "21:00",
+    "Price_USD": 2440,
+    "Gas_Gwei": 33.6
+  },
+  {
+    "Hour_UTC": "22:00",
+    "Price_USD": 2445,
+    "Gas_Gwei": 29.4
+  },
+  {
+    "Hour_UTC": "23:00",
+    "Price_USD": 2450,
+    "Gas_Gwei": 26.2
+  }
+]
