@@ -4,14 +4,13 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, AreaChart, Area,
 } from 'recharts';
-import { AlertCircle, Zap, Shield, TrendingDown, ExternalLink, Menu, ArrowRight } from 'lucide-react';
+import { Menu, ArrowDown, Shield, Zap, Cpu } from 'lucide-react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { DeFiRiskModel, MarketData, SimulationResult } from './riskModel';
-
-gsap.registerPlugin(ScrollTrigger);
+import { DeFiRiskModel, MarketData } from './riskModel';
 import crashData from './data.json';
 
+gsap.registerPlugin(ScrollTrigger);
 const marketData = crashData as MarketData[];
 
 // --- Components ---
@@ -29,8 +28,7 @@ const Preloader = ({ onComplete }: { onComplete: () => void }) => {
         }
         return prev + 1;
       });
-    }, 20);
-
+    }, 15);
     return () => clearInterval(interval);
   }, []);
 
@@ -48,34 +46,45 @@ const Preloader = ({ onComplete }: { onComplete: () => void }) => {
   return (
     <div id="preloader" ref={containerRef}>
       <div className="loader-percentage">{percent}%</div>
-      <div style={{ fontFamily: 'var(--serif)', textTransform: 'uppercase', letterSpacing: '0.5em', fontSize: '0.8rem' }}>
-        Summer.fi Risk Analysis
+      <div style={{ display: 'flex', gap: '2rem', alignItems: 'center', opacity: 0.5 }}>
+        <div style={{ fontFamily: 'var(--serif)', textTransform: 'uppercase', letterSpacing: '0.5em', fontSize: '0.7rem' }}>
+          Summer.fi / Risk Research
+        </div>
       </div>
     </div>
   );
 };
 
-const NavBar = () => (
-  <nav className="nav-bar">
-    <div className="nav-link" style={{ fontWeight: 900, fontSize: '1.2rem' }}>Summer.fi</div>
-    <div style={{ display: 'flex', gap: '3rem' }}>
-      <a href="#analysis" className="nav-link">Analysis</a>
-      <a href="#simulator" className="nav-link">Simulator</a>
-      <a href="#" className="nav-link">Check Availability</a>
-      <Menu size={20} style={{ cursor: 'pointer' }} />
-    </div>
-  </nav>
-);
+const NavBar = () => {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  return (
+    <nav className="nav-bar" style={{ padding: scrolled ? '1rem 4rem' : '1.5rem 4rem' }}>
+      <div className="nav-link" style={{ fontWeight: 900, fontSize: '1.2rem' }}>Summer.fi</div>
+      <div style={{ display: 'flex', gap: '3rem', alignItems: 'center' }}>
+        <a href="#event" className="nav-link">The Event</a>
+        <a href="#simulator" className="nav-link">The Model</a>
+        <a href="#methodology" className="nav-link">Methodology</a>
+        <Menu size={20} style={{ cursor: 'pointer' }} />
+      </div>
+    </nav>
+  );
+};
 
 // --- Main Page ---
 
-export default function RiskShowcase() {
+export default function CaseStudy() {
   const [loading, setLoading] = useState(true);
   const [ltv, setLtv] = useState(0.70);
   const [buffer, setBuffer] = useState(0.05);
   const [strategy, setStrategy] = useState<'static' | 'dynamic'>('static');
   
-  const heroRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
 
   const simulation = useMemo(() => {
@@ -97,29 +106,19 @@ export default function RiskShowcase() {
         '-=1'
       );
 
-      // Scroll Animations
-      gsap.from('.editorial-text p', {
-        scrollTrigger: {
-          trigger: '.editorial-text',
-          start: 'top 80%',
-        },
-        y: 50,
-        opacity: 0,
-        duration: 1,
-        stagger: 0.2,
-        ease: 'power3.out'
-      });
-
-      gsap.from('.luxury-card', {
-        scrollTrigger: {
-          trigger: '.luxury-card',
-          start: 'top 90%',
-        },
-        y: 100,
-        opacity: 0,
-        duration: 1.5,
-        stagger: 0.1,
-        ease: 'power4.out'
+      // Section Entrance Animations
+      gsap.utils.toArray<HTMLElement>('.section-container').forEach((section) => {
+        gsap.from(section.querySelectorAll('h2, p, .simulator-showcase, .stat-box, .method-card'), {
+          scrollTrigger: {
+            trigger: section,
+            start: 'top 80%',
+          },
+          y: 40,
+          opacity: 0,
+          duration: 1,
+          stagger: 0.1,
+          ease: 'power2.out'
+        });
       });
     }
   }, [loading]);
@@ -131,196 +130,262 @@ export default function RiskShowcase() {
       <main style={{ visibility: loading ? 'hidden' : 'visible' }}>
         <NavBar />
 
-        {/* Hero Section */}
-        <section className="hero-section" ref={heroRef}>
+        {/* Hero */}
+        <section className="hero-section">
           <div style={{ overflow: 'hidden' }}>
             <h1 className="hero-title" ref={titleRef}>Black Monday</h1>
           </div>
           <p className="hero-subtitle">
-            An editorial post-mortem of the August 5, 2024 ETH crash and the resilience of automated safety protocols.
+            A high-fidelity stress test of DeFi liquidation engines during the August 5th ETH volatility event.
           </p>
-          <div style={{ marginTop: '4rem', opacity: 0.5 }}>
-            <ArrowRight size={32} className="scroll-indicator" />
+          <div style={{ marginTop: '4rem', opacity: 0.2 }}>
+            <ArrowDown size={32} />
           </div>
         </section>
 
-        {/* Editorial Section 1 */}
-        <section id="analysis" className="section-container">
-          <div className="content-grid">
-            <div className="editorial-text">
-              <h2>The Precipice</h2>
+        {/* Chapter 1: The Event */}
+        <section id="event" className="section-container">
+          <div className="chapter-label">Chapter 01 / Market Dynamics</div>
+          <div className="editorial-text">
+            <h2>The Precipice</h2>
+            <div>
               <p>
-                On August 5th, 2024, the decentralized finance ecosystem faced its most significant stress test since the FTX collapse. 
-                In a span of just a few hours, Ethereum (ETH) plummeted 22%, triggering a cascade of liquidations across major lending protocols.
+                August 5, 2024, was not just a price drop—it was a systemic test. Ethereum’s price collapsed 22% in hours, triggering a cascade of liquidations that congested the network and spiked gas prices to over 700 Gwei.
               </p>
               <p>
-                As gas prices spiked to 710 Gwei, the bottleneck wasn't just price—it was execution. Summer.fi's automated safety triggers 
-                were designed for exactly this moment, but the sheer velocity of the crash redefined the limits of "on-chain safety."
+                In this environment, "Safety" became a moving target. Standard automation triggers failed as execution times lagged behind the rapid price decline.
               </p>
             </div>
           </div>
-        </section>
 
-        {/* Visual Impact Quote */}
-        <section className="section-container" style={{ textAlign: 'center', background: '#fff', padding: '12rem 2rem' }}>
-          <h2 style={{ fontSize: '4rem', maxWidth: '1000px', margin: '0 auto', textTransform: 'none', fontStyle: 'italic' }}>
-            "The difference between a 10% loss and total liquidation was measured in minutes and gwei."
-          </h2>
-          <p style={{ marginTop: '2rem', opacity: 0.5, textTransform: 'uppercase', letterSpacing: '0.2em' }}>— Risk Research Division</p>
-        </section>
-
-        {/* Stats Grid - Editorial Style */}
-        <section className="section-container">
-          <div className="content-grid">
-            <div className="luxury-card" style={{ gridColumn: '1 / 5' }}>
-              <h3 style={{ fontSize: '0.8rem', opacity: 0.5, marginBottom: '1rem' }}>Peak Volatility</h3>
-              <div style={{ fontSize: '4rem', fontWeight: 900, fontFamily: 'var(--serif)' }}>-22%</div>
-              <p style={{ fontSize: '0.9rem', marginTop: '1rem' }}>ETH Price drop in a single trading session.</p>
+          <div className="stats-row">
+            <div className="stat-box">
+              <div className="stat-number">-22%</div>
+              <div className="stat-label">ETH Volatility (4h)</div>
             </div>
-            <div className="luxury-card" style={{ gridColumn: '5 / 9' }}>
-              <h3 style={{ fontSize: '0.8rem', opacity: 0.5, marginBottom: '1rem' }}>Network Congestion</h3>
-              <div style={{ fontSize: '4rem', fontWeight: 900, fontFamily: 'var(--serif)' }}>710</div>
-              <p style={{ fontSize: '0.9rem', marginTop: '1rem' }}>Gwei at the peak of the panic selling.</p>
+            <div className="stat-box">
+              <div className="stat-number">710</div>
+              <div className="stat-label">Peak Network Gwei</div>
             </div>
-            <div className="luxury-card" style={{ gridColumn: '9 / 13' }}>
-              <h3 style={{ fontSize: '0.8rem', opacity: 0.5, marginBottom: '1rem' }}>System Status</h3>
-              <div style={{ fontSize: '4rem', fontWeight: 900, fontFamily: 'var(--serif)', color: 'var(--safe)' }}>O.K.</div>
-              <p style={{ fontSize: '0.9rem', marginTop: '1rem' }}>Automated triggers maintained solvency for 98% of users.</p>
+            <div className="stat-box">
+              <div className="stat-number">$1.2B</div>
+              <div className="stat-label">Total Liquidations</div>
             </div>
           </div>
         </section>
 
-        {/* Simulator Section */}
-        <section id="simulator" className="simulator-container">
-          <div className="section-container">
-            <div style={{ marginBottom: '6rem' }}>
-              <h2 style={{ fontSize: '3rem' }}>Stress Test Simulator</h2>
-              <p style={{ opacity: 0.6, fontFamily: 'var(--serif)', fontStyle: 'italic' }}>Adjust parameters to witness the crash dynamics in real-time.</p>
+        {/* Chapter 2: The Model */}
+        <section id="simulator" className="section-container">
+          <div className="chapter-label">Chapter 02 / Simulation Engine</div>
+          <div className="editorial-text">
+            <h2>Scenario Analysis</h2>
+            <div>
+              <p>
+                We reconstructed the August 5th event using minute-by-minute price and gas data. This simulator calculates the "Effective LTV" by accounting for slippage and gas costs in real-time.
+              </p>
+              <p>
+                Adjust the parameters below to see how different protection strategies would have fared during the crash.
+              </p>
             </div>
+          </div>
 
-            <div className="content-grid">
-              <div className="controls-panel">
-                <div className="control-group">
-                  <label style={{ textTransform: 'uppercase', fontSize: '0.7rem', letterSpacing: '0.1em', display: 'block', marginBottom: '1rem' }}>
-                    Initial Loan-To-Value: {(ltv * 100).toFixed(0)}%
-                  </label>
-                  <input type="range" min="0.5" max="0.8" step="0.01" value={ltv} onChange={(e) => setLtv(parseFloat(e.target.value))} />
-                </div>
-
-                <div className="control-group">
-                  <label style={{ textTransform: 'uppercase', fontSize: '0.7rem', letterSpacing: '0.1em', display: 'block', marginBottom: '1rem' }}>
-                    Stop-Loss Buffer: {(buffer * 100).toFixed(0)}%
-                  </label>
-                  <input type="range" min="0.02" max="0.15" step="0.01" value={buffer} onChange={(e) => setBuffer(parseFloat(e.target.value))} />
-                </div>
-
-                <div className="control-group">
-                  <label style={{ textTransform: 'uppercase', fontSize: '0.7rem', letterSpacing: '0.1em', display: 'block', marginBottom: '1rem' }}>
-                    Execution Strategy
-                  </label>
-                  <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                    <button
-                      onClick={() => setStrategy('static')}
-                      style={{
-                        flex: 1, padding: '1rem', border: '1px solid var(--border)', cursor: 'pointer',
-                        background: strategy === 'static' ? 'var(--accent)' : 'transparent',
-                        color: strategy === 'static' ? '#fff' : 'var(--accent)',
-                        fontFamily: 'var(--serif)', textTransform: 'uppercase', fontSize: '0.7rem'
-                      }}
-                    >Static</button>
-                    <button
-                      onClick={() => setStrategy('dynamic')}
-                      style={{
-                        flex: 1, padding: '1rem', border: '1px solid var(--border)', cursor: 'pointer',
-                        background: strategy === 'dynamic' ? 'var(--accent)' : 'transparent',
-                        color: strategy === 'dynamic' ? '#fff' : 'var(--accent)',
-                        fontFamily: 'var(--serif)', textTransform: 'uppercase', fontSize: '0.7rem'
-                      }}
-                    >Gas-Aware</button>
-                  </div>
-                </div>
-
-                <div style={{ marginTop: '2rem', padding: '2rem', border: '1px solid var(--border)', textAlign: 'center' }}>
-                  <div style={{ 
-                    fontFamily: 'var(--serif)', 
-                    fontSize: '1.5rem', 
-                    color: simulation.status === 'liquidated' ? 'var(--danger)' : 'var(--safe)',
-                    textTransform: 'uppercase',
-                    marginBottom: '0.5rem'
-                  }}>
-                    {simulation.status === 'liquidated' ? 'Liquidation' : 'Position Protected'}
-                  </div>
-                  <div style={{ opacity: 0.5, fontSize: '0.8rem' }}>
-                    Final Capital: ${simulation.finalValue.toLocaleString()}
-                  </div>
-                </div>
+          <div className="simulator-showcase">
+            <div className="controls-grid">
+              <div className="control-group">
+                <label style={{ textTransform: 'uppercase', fontSize: '0.65rem', letterSpacing: '0.2em', opacity: 0.6 }}>
+                  Entry LTV: {(ltv * 100).toFixed(0)}%
+                </label>
+                <input type="range" min="0.5" max="0.8" step="0.01" value={ltv} onChange={(e) => setLtv(parseFloat(e.target.value))} style={{ accentColor: 'var(--accent)' }} />
               </div>
 
-              <div className="chart-panel">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={simulation.history}>
-                    <defs>
-                      <linearGradient id="colorLtv" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor={simulation.status === 'liquidated' ? 'var(--danger)' : 'var(--accent)'} stopOpacity={0.2}/>
-                        <stop offset="95%" stopColor={simulation.status === 'liquidated' ? 'var(--danger)' : 'var(--accent)'} stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="1 1" stroke="rgba(0,0,0,0.05)" vertical={false} />
-                    <XAxis dataKey="hour" hide />
-                    <YAxis domain={[0.4, 1.0]} hide />
-                    <Tooltip 
-                      contentStyle={{ background: 'var(--background)', border: '1px solid var(--border)', fontFamily: 'var(--serif)' }}
-                    />
-                    <Area 
-                      type="monotone" dataKey="ltv" stroke={simulation.status === 'liquidated' ? 'var(--danger)' : 'var(--accent)'} 
-                      fillOpacity={1} fill="url(#colorLtv)" strokeWidth={1}
-                    />
-                    <ReferenceLine y={0.825} stroke="var(--danger)" strokeDasharray="3 3" />
-                  </AreaChart>
-                </ResponsiveContainer>
+              <div className="control-group">
+                <label style={{ textTransform: 'uppercase', fontSize: '0.65rem', letterSpacing: '0.2em', opacity: 0.6 }}>
+                  Protection Buffer: {(buffer * 100).toFixed(0)}%
+                </label>
+                <input type="range" min="0.02" max="0.15" step="0.01" value={buffer} onChange={(e) => setBuffer(parseFloat(e.target.value))} style={{ accentColor: 'var(--accent)' }} />
+              </div>
+
+              <div className="control-group">
+                <label style={{ textTransform: 'uppercase', fontSize: '0.65rem', letterSpacing: '0.2em', opacity: 0.6 }}>
+                  Execution Strategy
+                </label>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <button
+                    onClick={() => setStrategy('static')}
+                    style={{
+                      flex: 1, padding: '0.8rem', border: '1px solid var(--border)', cursor: 'pointer',
+                      background: strategy === 'static' ? 'var(--accent)' : 'transparent',
+                      color: strategy === 'static' ? '#fff' : 'var(--accent)',
+                      fontFamily: 'var(--serif)', textTransform: 'uppercase', fontSize: '0.65rem', letterSpacing: '0.1em'
+                    }}
+                  >Static</button>
+                  <button
+                    onClick={() => setStrategy('dynamic')}
+                    style={{
+                      flex: 1, padding: '0.8rem', border: '1px solid var(--border)', cursor: 'pointer',
+                      background: strategy === 'dynamic' ? 'var(--accent)' : 'transparent',
+                      color: strategy === 'dynamic' ? '#fff' : 'var(--accent)',
+                      fontFamily: 'var(--serif)', textTransform: 'uppercase', fontSize: '0.65rem', letterSpacing: '0.1em'
+                    }}
+                  >Dynamic Gas</button>
+                </div>
+              </div>
+            </div>
+
+            <div className="chart-wide">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={simulation.history}>
+                  <defs>
+                    <linearGradient id="colorLtv" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={simulation.status === 'liquidated' ? 'var(--danger)' : 'var(--accent)'} stopOpacity={0.15}/>
+                      <stop offset="95%" stopColor={simulation.status === 'liquidated' ? 'var(--danger)' : 'var(--accent)'} stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.03)" vertical={false} />
+                  <XAxis dataKey="hour" hide />
+                  <YAxis domain={[0.4, 0.9]} hide />
+                  <Tooltip 
+                    contentStyle={{ background: 'var(--background)', border: '1px solid var(--border)', fontFamily: 'var(--serif)', borderRadius: '0' }}
+                  />
+                  <Area 
+                    type="stepAfter" dataKey="ltv" stroke={simulation.status === 'liquidated' ? 'var(--danger)' : 'var(--accent)'} 
+                    fillOpacity={1} fill="url(#colorLtv)" strokeWidth={2}
+                  />
+                  <ReferenceLine y={0.825} stroke="var(--danger)" strokeDasharray="5 5" label={{ value: 'Liquidation Threshold', position: 'insideTopRight', fontSize: 10, fill: 'var(--danger)', opacity: 0.5 }} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border)', paddingTop: '2rem' }}>
+              <div>
+                <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', opacity: 0.5, letterSpacing: '0.1em' }}>Simulation Result</div>
+                <div style={{ 
+                  fontFamily: 'var(--serif)', 
+                  fontSize: '2.5rem', 
+                  color: simulation.status === 'liquidated' ? 'var(--danger)' : 'var(--safe)',
+                  textTransform: 'uppercase',
+                  fontWeight: 900
+                }}>
+                  {simulation.status === 'liquidated' ? 'Liquidated' : 'Protected'}
+                </div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', opacity: 0.5, letterSpacing: '0.1em' }}>Final Capital Value</div>
+                <div style={{ fontSize: '2.5rem', fontWeight: 900, fontFamily: 'var(--serif)' }}>
+                  ${simulation.finalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Methodology Footer */}
-        <footer className="section-container" style={{ padding: '8rem 2rem', borderTop: '1px solid var(--border)' }}>
-          <div className="content-grid">
-            <div style={{ gridColumn: '1 / 6' }}>
-              <h2 style={{ fontSize: '1.2rem', marginBottom: '2rem' }}>Summer.fi</h2>
-              <p style={{ opacity: 0.5, fontSize: '0.9rem', maxWidth: '300px' }}>
-                Crafting luxury risk infrastructure for the decentralized age.
+        {/* Chapter 3: Methodology */}
+        <section id="methodology" className="section-container">
+          <div className="chapter-label">Chapter 03 / Engineering Insight</div>
+          <div className="editorial-text">
+            <h2>The Logic</h2>
+            <div>
+              <p>
+                A robust risk model must account for the infrastructure reality. During crashes, DEX liquidity thins and MEV bots compete for blockspace, increasing the cost of safety.
               </p>
             </div>
-            <div style={{ gridColumn: '7 / 9' }}>
-              <h4 style={{ fontSize: '0.7rem', opacity: 0.5, marginBottom: '1.5rem' }}>Research</h4>
-              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '0.9rem' }}>
-                <li>Methodology</li>
-                <li>Data Sourcing</li>
-                <li>Whitepaper</li>
-              </ul>
+          </div>
+
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(3, 1fr)', 
+            gap: '2rem', 
+            width: '100%', 
+            maxWidth: '1200px',
+            marginTop: '2rem'
+          }}>
+            <div className="method-card" style={{ padding: '3rem', border: '1px solid var(--border)', background: 'var(--glass)' }}>
+              <Shield size={32} style={{ marginBottom: '2rem' }} />
+              <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', textAlign: 'left' }}>Safety Buffers</h3>
+              <p style={{ fontSize: '0.9rem', textAlign: 'left', opacity: 0.6 }}>
+                Calculated as (Liquidation Threshold - Buffer). This provides the necessary margin to execute trades before the liquidation threshold is hit.
+              </p>
             </div>
-            <div style={{ gridColumn: '9 / 11' }}>
-              <h4 style={{ fontSize: '0.7rem', opacity: 0.5, marginBottom: '1.5rem' }}>Legal</h4>
-              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '0.9rem' }}>
-                <li>Privacy Policy</li>
-                <li>Terms of Service</li>
-              </ul>
+            <div className="method-card" style={{ padding: '3rem', border: '1px solid var(--border)', background: 'var(--glass)' }}>
+              <Zap size={32} style={{ marginBottom: '2rem' }} />
+              <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', textAlign: 'left' }}>Dynamic Scaling</h3>
+              <p style={{ fontSize: '0.9rem', textAlign: 'left', opacity: 0.6 }}>
+                Our model adjusts trigger sensitivity based on network congestion (Gwei). Higher gas prices require earlier triggers to offset slippage risk.
+              </p>
             </div>
-            <div style={{ gridColumn: '11 / 13' }}>
-              <h4 style={{ fontSize: '0.7rem', opacity: 0.5, marginBottom: '1.5rem' }}>Social</h4>
-              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '0.9rem' }}>
-                <li>Twitter / X</li>
-                <li>Discord</li>
-                <li>GitHub</li>
-              </ul>
+            <div className="method-card" style={{ padding: '3rem', border: '1px solid var(--border)', background: 'var(--glass)' }}>
+              <Cpu size={32} style={{ marginBottom: '2rem' }} />
+              <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', textAlign: 'left' }}>Slippage Estimator</h3>
+              <p style={{ fontSize: '0.9rem', textAlign: 'left', opacity: 0.6 }}>
+                Accounts for the "Price of Liquidity." As volatility increases, the cost of swapping collateral for debt scales non-linearly.
+              </p>
             </div>
           </div>
-          <div style={{ marginTop: '8rem', paddingTop: '4rem', borderTop: '1px solid var(--border)', fontSize: '0.7rem', opacity: 0.3, textAlign: 'center', textTransform: 'uppercase', letterSpacing: '0.2em' }}>
-            © 2026 Summer.fi • Italian Flair in Risk Management
+        </section>
+
+        {/* Final CTA */}
+        <section className="section-container" style={{ textAlign: 'center', background: 'var(--foreground)', color: 'var(--background)' }}>
+          <h2 style={{ fontSize: 'clamp(2rem, 8vw, 6rem)', color: 'inherit', marginBottom: '4rem' }}>Secure Your Capital</h2>
+          <p style={{ color: 'inherit', opacity: 0.6, maxWidth: '600px', margin: '0 auto 4rem', fontSize: '1.2rem' }}>
+            Explore how Summer.fi's automated triggers provide institutional-grade protection for DeFi positions.
+          </p>
+          <button style={{ 
+            padding: '1.5rem 4rem', 
+            background: 'var(--background)', 
+            color: 'var(--foreground)', 
+            border: 'none', 
+            fontFamily: 'var(--serif)', 
+            textTransform: 'uppercase', 
+            letterSpacing: '0.3em',
+            fontSize: '0.8rem',
+            fontWeight: 900,
+            cursor: 'pointer',
+            transition: 'transform 0.3s ease'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+          onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+          >
+            View Technical Documentation
+          </button>
+        </section>
+
+        {/* Footer */}
+        <footer className="section-container" style={{ padding: '4rem', borderTop: 'none', background: 'var(--background)' }}>
+          <div style={{ width: '100%', maxWidth: '1200px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+            <div>
+              <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem', textAlign: 'left' }}>Summer.fi</h2>
+              <p style={{ opacity: 0.4, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.2em', textAlign: 'left' }}>
+                Risk Analysis / Case Study 001
+              </p>
+            </div>
+            <div style={{ opacity: 0.4, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.2em' }}>
+              Built with Next.js & GSAP
+            </div>
           </div>
         </footer>
       </main>
+
+      <style jsx global>{`
+        input[type='range'] {
+          -webkit-appearance: none;
+          width: 100%;
+          background: transparent;
+        }
+        input[type='range']::-webkit-slider-runnable-track {
+          width: 100%;
+          height: 2px;
+          background: var(--border);
+        }
+        input[type='range']::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          height: 12px;
+          width: 12px;
+          border-radius: 50%;
+          background: var(--accent);
+          cursor: pointer;
+          margin-top: -5px;
+        }
+      `}</style>
     </>
   );
 }
