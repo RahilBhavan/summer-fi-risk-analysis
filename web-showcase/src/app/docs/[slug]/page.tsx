@@ -11,11 +11,11 @@ interface PageProps {
 }
 
 const SLUG_TO_PATH: Record<string, string> = {
-  'consulting-report': '../CONSULTING_REPORT.md',
-  'root-readme': '../README.md',
-  'project-oversight': '../PROJECT_OVERSIGHT.md',
-  'backtest-report': '../reports/backtest_report_aug5.md',
-  'web-showcase-readme': 'README.md',
+  'consulting-report': 'CONSULTING_REPORT.md',
+  'root-readme': 'README.md',
+  'project-oversight': 'PROJECT_OVERSIGHT.md',
+  'backtest-report': 'reports/backtest_report_aug5.md',
+  'web-showcase-readme': 'web-showcase/README.md',
 };
 
 export default async function DocDetail({ params }: PageProps) {
