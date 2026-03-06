@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, AreaChart, Area,
 } from 'recharts';
@@ -55,6 +56,8 @@ const Preloader = ({ onComplete }: { onComplete: () => void }) => {
   );
 };
 
+// ... (NavBar component)
+
 const NavBar = () => {
   const [scrolled, setScrolled] = useState(false);
 
@@ -71,6 +74,7 @@ const NavBar = () => {
         <a href="#event" className="nav-link">The Event</a>
         <a href="#simulator" className="nav-link">The Model</a>
         <a href="#methodology" className="nav-link">Methodology</a>
+        <Link href="/docs" className="nav-link" style={{ opacity: 0.6, border: '1px solid rgba(255,255,255,0.2)', padding: '0.4rem 1rem', borderRadius: '4px' }}>Docs</Link>
         <Menu size={20} style={{ cursor: 'pointer' }} />
       </div>
     </nav>
@@ -329,11 +333,12 @@ export default function CaseStudy() {
           <p style={{ color: 'inherit', opacity: 0.6, maxWidth: '600px', margin: '0 auto 4rem', fontSize: '1.2rem' }}>
             Explore how Summer.fi's automated triggers provide institutional-grade protection for DeFi positions.
           </p>
-          <button style={{ 
+          <Link href="/docs" style={{ 
+            display: 'inline-block',
             padding: '1.5rem 4rem', 
             background: 'var(--background)', 
             color: 'var(--foreground)', 
-            border: 'none', 
+            textDecoration: 'none',
             fontFamily: 'var(--serif)', 
             textTransform: 'uppercase', 
             letterSpacing: '0.3em',
@@ -346,7 +351,7 @@ export default function CaseStudy() {
           onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
           >
             View Technical Documentation
-          </button>
+          </Link>
         </section>
 
         {/* Footer */}

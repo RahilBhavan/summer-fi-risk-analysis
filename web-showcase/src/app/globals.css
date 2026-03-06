@@ -256,3 +256,87 @@ p {
     padding: 1rem 2rem;
   }
 }
+
+/* Markdown Documentation Styles */
+.markdown-body {
+  font-family: var(--sans);
+  line-height: 1.8;
+  color: var(--foreground);
+}
+.markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4 {
+  font-family: var(--serif);
+  margin-top: 3rem;
+  margin-bottom: 1.5rem;
+  text-transform: none;
+  color: var(--foreground);
+}
+.markdown-body h1 { font-size: 2.5rem; }
+.markdown-body h2 { font-size: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+.markdown-body h3 { font-size: 1.5rem; }
+.markdown-body p { margin-bottom: 1.5rem; opacity: 0.8; }
+.markdown-body ul, .markdown-body ol { margin-bottom: 1.5rem; padding-left: 2rem; }
+.markdown-body li { margin-bottom: 0.5rem; opacity: 0.8; }
+.markdown-body code { 
+  background: var(--glass); 
+  padding: 0.2rem 0.4rem; 
+  border-radius: 4px; 
+  font-size: 0.9em;
+  font-family: monospace;
+}
+.markdown-body pre {
+  background: #1e1e1e;
+  color: #d4d4d4;
+  padding: 2rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 2rem 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.markdown-body pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+.markdown-body blockquote {
+  border-left: 4px solid var(--accent);
+  padding-left: 1.5rem;
+  margin: 2rem 0;
+  font-style: italic;
+  opacity: 0.7;
+}
+.markdown-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 2rem 0;
+}
+.markdown-body th, .markdown-body td {
+  border: 1px solid var(--border);
+  padding: 1rem;
+  text-align: left;
+}
+.markdown-body th {
+  background: var(--glass);
+  font-family: var(--serif);
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+}
+
+/* Docs Hub Styles */
+.doc-link-card {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem;
+  border: 1px solid var(--border);
+  text-decoration: none;
+  color: inherit;
+  background: #fff;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.doc-link-card:hover {
+  transform: translateX(10px);
+  border-color: var(--accent);
+}
