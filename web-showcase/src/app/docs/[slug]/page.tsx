@@ -15,7 +15,7 @@ const SLUG_TO_PATH: Record<string, string> = {
   'root-readme': 'README.md',
   'project-oversight': 'PROJECT_OVERSIGHT.md',
   'backtest-report': 'reports/backtest_report_aug5.md',
-  'web-showcase-readme': 'web-showcase/README.md',
+  'web-showcase-readme': 'README.md',
 };
 
 export default async function DocDetail({ params }: PageProps) {
@@ -26,11 +26,18 @@ export default async function DocDetail({ params }: PageProps) {
     return notFound();
   }
 
-  const absolutePath = path.join(process.cwd(), filePath);
+  // Robust path resolution: check if we're running from root or web-showcase/
+  let absolutePath = path.join(process.cwd(), filePath);
   
   if (!fs.existsSync(absolutePath)) {
-    console.error(`File not found: ${absolutePath}`);
-    return notFound();
+    // Try parent directory if not found (in case process.cwd() is web-showcase/)
+    const fallbackPath = path.join(process.cwd(), '..', filePath);
+    if (fs.existsSync(fallbackPath)) {
+      absolutePath = fallbackPath;
+    } else {
+      console.error(`File not found: ${absolutePath} or ${fallbackPath}`);
+      return notFound();
+    }
   }
 
   const content = fs.readFileSync(absolutePath, 'utf8');
