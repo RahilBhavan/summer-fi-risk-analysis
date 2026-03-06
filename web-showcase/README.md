@@ -31,6 +31,16 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 ## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**From this repo (monorepo):** Deploy the `web-showcase` app only.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **CLI (from this directory):**
+   ```bash
+   npx vercel login   # once, to link your account
+   cd web-showcase
+   npx vercel         # preview
+   npx vercel --prod  # production
+   ```
+
+2. **Vercel Dashboard:** [Import from Git](https://vercel.com/new). Set **Root Directory** to `web-showcase` so Vercel builds this Next.js app.
+
+The app is optimized for Vercel (Next.js 16, `next/font`, security headers, production build settings).

@@ -1,9 +1,21 @@
 import type { Metadata } from "next";
+import { Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
 
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-serif",
+  weight: ["400", "700", "900"],
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+});
+
 export const metadata: Metadata = {
-  title: "Summer.fi Risk Analysis | Black Monday Case Study",
-  description: "Dynamic Stop-Loss Optimization for DeFi Protocols",
+  title: "Summer.fi | Risk Analysis",
+  description: "An editorial deep-dive into the August 5, 2024 'Black Monday' crash.",
 };
 
 export default function RootLayout({
@@ -12,15 +24,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
-      </head>
-      <body>
-        {children}
-      </body>
+    <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
+      <body>{children}</body>
     </html>
   );
 }
