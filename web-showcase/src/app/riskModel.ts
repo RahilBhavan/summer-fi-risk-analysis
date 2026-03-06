@@ -12,6 +12,9 @@ export interface SimulationResult {
   history: Array<{
     hour: string;
     ltv: number;
+    price: number;
+    gas: number;
+    slippage: number;
     status: 'active' | 'liquidated' | 'sl_triggered';
   }>;
 }
@@ -89,6 +92,9 @@ export class DeFiRiskModel {
       history.push({
         hour: step.Hour_UTC,
         ltv: currentLtv,
+        price: step.Price_USD,
+        gas: step.Gas_Gwei,
+        slippage: this.estimateSlippage(step.Price_USD, step.Gas_Gwei),
         status: status
       });
     }

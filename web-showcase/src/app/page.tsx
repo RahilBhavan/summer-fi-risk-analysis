@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import {
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, AreaChart, Area,
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, AreaChart, Area, ComposedChart, Bar, Line, ReferenceArea,
 } from 'recharts';
 import { Menu, ArrowDown, Shield, Zap, Cpu } from 'lucide-react';
 import { gsap } from 'gsap';
@@ -15,6 +15,47 @@ gsap.registerPlugin(ScrollTrigger);
 const marketData = crashData as MarketData[];
 
 // --- Components ---
+
+const CustomTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div style={{ background: 'var(--background)', border: '1px solid var(--border)', padding: '1.5rem', fontFamily: 'var(--serif)', minWidth: '220px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}>
+        <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', opacity: 0.5, marginBottom: '1.2rem', letterSpacing: '0.2em', borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem' }}>
+          Hour {data.hour}:00 UTC
+        </div>
+        
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.8rem' }}>
+          <span style={{ opacity: 0.6, fontSize: '0.8rem' }}>LTV Ratio</span>
+          <span style={{ fontWeight: 900 }}>{(data.ltv * 100).toFixed(2)}%</span>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.8rem' }}>
+          <span style={{ opacity: 0.6, fontSize: '0.8rem' }}>ETH Price</span>
+          <span style={{ fontWeight: 900 }}>${data.price.toLocaleString()}</span>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.8rem' }}>
+          <span style={{ opacity: 0.6, fontSize: '0.8rem' }}>Gas Price</span>
+          <span style={{ fontWeight: 900, color: data.gas > 150 ? 'var(--danger)' : 'inherit' }}>{data.gas.toFixed(1)} Gwei</span>
+        </div>
+        
+        <div style={{ 
+          marginTop: '1rem', 
+          padding: '0.5rem', 
+          background: data.status === 'liquidated' ? 'rgba(208, 49, 45, 0.1)' : (data.status === 'sl_triggered' ? 'rgba(46, 125, 50, 0.1)' : 'var(--glass)'),
+          textAlign: 'center',
+          fontSize: '0.7rem',
+          fontWeight: 900,
+          textTransform: 'uppercase',
+          letterSpacing: '0.1em',
+          color: data.status === 'liquidated' ? 'var(--danger)' : (data.status === 'sl_triggered' ? 'var(--safe)' : 'inherit')
+        }}>
+          {data.status === 'active' ? 'Position Protected' : (data.status === 'liquidated' ? 'Vault Liquidated' : 'Stop-Loss Executed')}
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
 
 const Preloader = ({ onComplete }: { onComplete: () => void }) => {
   const [percent, setPercent] = useState(0);
@@ -238,25 +279,106 @@ export default function CaseStudy() {
 
             <div className="chart-wide">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={simulation.history}>
+                <ComposedChart data={simulation.history}>
                   <defs>
                     <linearGradient id="colorLtv" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor={simulation.status === 'liquidated' ? 'var(--danger)' : 'var(--accent)'} stopOpacity={0.15}/>
                       <stop offset="95%" stopColor={simulation.status === 'liquidated' ? 'var(--danger)' : 'var(--accent)'} stopOpacity={0}/>
                     </linearGradient>
                   </defs>
+                  
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.03)" vertical={false} />
-                  <XAxis dataKey="hour" hide />
-                  <YAxis domain={[0.4, 0.9]} hide />
-                  <Tooltip 
-                    contentStyle={{ background: 'var(--background)', border: '1px solid var(--border)', fontFamily: 'var(--serif)', borderRadius: '0' }}
+                  
+                  <XAxis 
+                    dataKey="hour" 
+                    interval={2}
+                    tick={{ fontSize: 10, fontFamily: 'var(--serif)', opacity: 0.5 }}
+                    axisLine={false}
+                    tickLine={false}
                   />
+                  
+                  {/* Left Axis: LTV & Thresholds */}
+                  <YAxis 
+                    yAxisId="left"
+                    domain={[0.4, 0.95]} 
+                    hide 
+                  />
+                  
+                  {/* Right Axis: ETH Price */}
+                  <YAxis 
+                    yAxisId="right"
+                    orientation="right"
+                    domain={['auto', 'auto']}
+                    hide
+                  />
+
+                  {/* Risk Zones */}
+                  <ReferenceArea 
+                    yAxisId="left"
+                    y1={0.825} 
+                    y2={0.95} 
+                    fill="var(--danger)" 
+                    fillOpacity={0.03} 
+                  />
+                  <ReferenceArea 
+                    yAxisId="left"
+                    y1={0.825 - buffer} 
+                    y2={0.825} 
+                    fill="orange" 
+                    fillOpacity={0.03} 
+                  />
+
+                  <Tooltip content={<CustomTooltip />} />
+                  
+                  {/* Gas Prices (Bars) */}
+                  <Bar 
+                    yAxisId="right" 
+                    dataKey="gas" 
+                    fill="var(--accent)" 
+                    opacity={0.05} 
+                    barSize={20}
+                  />
+
+                  {/* ETH Price (Baseline) */}
+                  <Line 
+                    yAxisId="right"
+                    type="monotone"
+                    dataKey="price"
+                    stroke="var(--accent)"
+                    strokeWidth={1}
+                    dot={false}
+                    strokeDasharray="5 5"
+                    opacity={0.2}
+                  />
+
+                  {/* LTV (Primary Metric) */}
                   <Area 
-                    type="stepAfter" dataKey="ltv" stroke={simulation.status === 'liquidated' ? 'var(--danger)' : 'var(--accent)'} 
-                    fillOpacity={1} fill="url(#colorLtv)" strokeWidth={2}
+                    yAxisId="left"
+                    type="stepAfter" 
+                    dataKey="ltv" 
+                    stroke={simulation.status === 'liquidated' ? 'var(--danger)' : 'var(--accent)'} 
+                    fillOpacity={1} 
+                    fill="url(#colorLtv)" 
+                    strokeWidth={3}
                   />
-                  <ReferenceLine y={0.825} stroke="var(--danger)" strokeDasharray="5 5" label={{ value: 'Liquidation Threshold', position: 'insideTopRight', fontSize: 10, fill: 'var(--danger)', opacity: 0.5 }} />
-                </AreaChart>
+
+                  {/* Thresholds */}
+                  <ReferenceLine 
+                    yAxisId="left"
+                    y={0.825} 
+                    stroke="var(--danger)" 
+                    strokeDasharray="3 3" 
+                    label={{ value: 'LIQUIDATION', position: 'insideTopRight', fontSize: 9, fill: 'var(--danger)', fontWeight: 900, letterSpacing: '0.1em' }} 
+                  />
+                  
+                  <ReferenceLine 
+                    yAxisId="left"
+                    y={0.825 - buffer} 
+                    stroke="var(--safe)" 
+                    strokeDasharray="3 3" 
+                    label={{ value: 'PROTECTION TRIGGER', position: 'insideBottomRight', fontSize: 9, fill: 'var(--safe)', fontWeight: 900, letterSpacing: '0.1em' }} 
+                  />
+                </ComposedChart>
               </ResponsiveContainer>
             </div>
 
@@ -359,9 +481,20 @@ export default function CaseStudy() {
           <div style={{ width: '100%', maxWidth: '1200px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
             <div>
               <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem', textAlign: 'left' }}>Summer.fi</h2>
-              <p style={{ opacity: 0.4, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.2em', textAlign: 'left' }}>
-                Risk Analysis / Case Study 001
-              </p>
+              <div style={{ display: 'flex', gap: '2rem' }}>
+                <p style={{ opacity: 0.4, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.2em', textAlign: 'left' }}>
+                  Risk Analysis / Case Study 001
+                </p>
+                <a 
+                  href="https://github.com/RahilBhavan/summer-fi-risk-analysis" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="nav-link"
+                  style={{ fontSize: '0.7rem', opacity: 0.4 }}
+                >
+                  GitHub Repository
+                </a>
+              </div>
             </div>
             <div style={{ opacity: 0.4, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.2em' }}>
               Built with Next.js & GSAP
