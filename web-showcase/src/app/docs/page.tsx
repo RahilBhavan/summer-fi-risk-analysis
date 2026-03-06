@@ -4,6 +4,12 @@ import { FileText, ArrowLeft, Briefcase, Target, Info } from 'lucide-react';
 export default function DocsPage() {
   const docs = [
     {
+      title: 'Consulting Case Study',
+      slug: 'consulting-report',
+      description: 'Strategic analysis of the engagement objectives, methodology, and high-level findings.',
+      icon: <Briefcase size={20} />
+    },
+    {
       title: 'Project Overview',
       slug: 'root-readme',
       description: 'The main project description and execution guide.',

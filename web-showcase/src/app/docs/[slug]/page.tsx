@@ -11,6 +11,7 @@ interface PageProps {
 }
 
 const SLUG_TO_PATH: Record<string, string> = {
+  'consulting-report': '../CONSULTING_REPORT.md',
   'root-readme': '../README.md',
   'project-oversight': '../PROJECT_OVERSIGHT.md',
   'backtest-report': '../reports/backtest_report_aug5.md',
