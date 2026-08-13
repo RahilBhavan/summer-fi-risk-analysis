@@ -14,7 +14,7 @@ const docs: Array<[string, string, string, ReactNode]> = [
 ];
 
 export default function DocsPage() {
-  return <div style={{minHeight:'100vh',background:'var(--background)',padding:'4rem 2rem'}}><div style={{maxWidth:'900px',margin:'0 auto'}}>
+  return <div style={{minHeight:'100vh',background:'var(--background)',padding:'4rem 2rem'}}><div className="docs-rail">
     <Link href="/" style={{display:'flex',gap:'.5rem',alignItems:'center',marginBottom:'4rem'}}><ArrowLeft aria-hidden="true" size={16}/> Back to Showcase</Link>
     <header style={{marginBottom:'6rem'}}><h1>Technical Documentation</h1><p>A repository of static hourly scenario analysis for illustrative Aave V3 and Morpho lending-market assumptions. It documents decision-support methods, not live protocol use, forecasts, or organizational affiliation.</p></header>
     <section style={{marginBottom:'6rem',padding:'4rem',border:'1px solid var(--border)',background:'#fff'}}><h2>Project Context</h2><div className="docs-context-grid"><div><h3>WHO</h3><p>Independent candidate portfolio project demonstrating structured analysis and clear communication of risk trade-offs.</p></div><div><h3>WHERE</h3><p>Illustrative Aave V3 and Morpho lending-market scenarios using supplied hourly observations.</p></div><div><h3>WHY</h3><p>To examine how price movement and gas observations affect static risk decisions.</p></div><div><h3>HOW</h3><p>A static model applies explicit protocol thresholds, penalties, and protection buffers to nonempty hourly data.</p></div></div></section>
