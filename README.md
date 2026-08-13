@@ -1,55 +1,59 @@
-# Summer.fi Risk Analysis: Dynamic Stop-Loss Optimization
+# DeFi Risk Analysis: Stress-Test Decision Support
 
 ## Project Overview
-This project performs a high-fidelity stress-test analysis of Summer.fi's automation features (Stop-Loss, Auto-Buy/Sell) during extreme market volatility. Specifically, we investigate the **"August 5, 2024 Flash Crash"** to determine how gas price spikes and liquidity depth affect the execution of automated safety triggers.
+This independent portfolio case study examines how automated risk controls can behave during a sharp Ethereum market move. It uses a compact, reproducible scenario to translate price and network conditions into decision support for buffer selection, escalation, and stakeholder communication.
 
-The goal is to provide a data-backed recommendation for **Optimal Stop-Loss Buffers** for institutional and retail users on Aave vs. Morpho.
+The analysis compares lending-market scenarios associated with **Aave V3** and **Morpho**. These are illustrative scenarios, not claims about live protocol use or organizational work.
 
-## Case Study: August 5, 2024 ("Black Monday")
-*   **ETH Price Action:** -22% drop ($2,923 -> ~$2,100) in <24 hours.
-*   **Gas Environment:** Surged from <10 Gwei to **710 Gwei** (peak) and ~350 Gwei (average).
-*   **Systemic Stress:** Aave v3 handled 59% of its total historical liquidation volume in this single window.
-*   **The Problem:** Standard static Stop-Loss triggers may fail if the cost of execution (gas + slippage) exceeds the remaining collateral value, or if network congestion delays the transaction until the position is already underwater.
+## Case Study: August 5, 2024 Market Stress
+The model uses **24 hourly observations**:
 
-## Methodology: "Dynamic Risk Simulation"
-We employ a Gauntlet-style simulation framework:
-1.  **Data Ingestion:** Historical ETH/USD price data (1-minute intervals) and Etherscan gas price data for August 5, 2024.
-2.  **Protocol Modeling:**
-    *   **Aave v3:** Modeling liquidation thresholds and penalty (5%).
-    *   **Morpho:** Modeling the specific vault/market parameters.
-3.  **Automation Simulation:**
-    *   **Static Triggers:** Simulation of 10%, 15%, and 20% Stop-Loss buffers.
-    *   **Dynamic Triggers:** Modeling a "Gas-Aware" Stop-Loss that adjusts the trigger LTV based on real-time network congestion and slippage estimates.
-4.  **Backtesting:** Comparing "Capital Saved" vs. "Liquidation Occurred" for both strategies.
+- **ETH price:** 2,910 at the start, 2,120 at the trough (approximately a **27.1% intraday decline**), and 2,450 at the close (approximately a **15.8% close decline** from the start).
+- **Network conditions:** Peak observed gas was **681.4 Gwei**.
+- **Decision question:** How should a risk team evaluate stop-loss buffers when price movement, execution cost, and protocol assumptions interact?
+
+## Methodology: Illustrative Heuristic Model
+The workstream simplifies the problem to static analysis and a combined Aave V3/Morpho parameter sweep:
+
+1. Inspect the supplied hourly price and gas observations.
+2. Apply explicit assumptions for collateral, debt, loan-to-value thresholds, buffer levels, execution cost, and slippage.
+3. Compare indicative outcomes across lending-market scenarios and buffer choices.
+4. Synthesize recommendations, controls, trade-offs, and follow-up questions.
+
+The model is **illustrative and heuristic**. It is not a forecast, a valuation, a liquidation simulator for live markets, or evidence of protocol performance. Results depend on the assumptions and should be independently reviewed before use.
 
 ## How to Run
 
-### 1. Prerequisites
-Ensure you have Python 3.10+ installed. Install dependencies:
+### Prerequisites
+Use Python 3.10+ and install the dependencies listed in `requirements.txt`:
+
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Running Simulations
-You can run a single backtest with custom parameters:
+### Model Workstream
+Run the risk-model script according to its available command-line options. The intended analysis is a static review with a combined Aave V3/Morpho sweep; inspect the script help for the current interface before running it:
+
 ```bash
-python3 scripts/risk_model.py --ltv 0.75 --buffer 0.05 --protocol AaveV3
+python3 scripts/risk_model.py --combined-sweep
+python3 scripts/risk_model.py --protocol AaveV3 --ltv 0.70 --buffer 0.05
+python3 -m pytest tests
 ```
 
-To run a full **Parameter Sweep** (testing multiple LTV/Buffer combinations) and generate a results CSV:
-```bash
-python3 scripts/risk_model.py --sweep --protocol AaveV3
-```
+The notebook provides supplementary visual analysis:
 
-### 3. Analysis Notebook
-For visual analysis, heatmaps, and LTV trajectories, open the Jupyter notebook:
 ```bash
 jupyter notebook notebooks/aug5_analysis.ipynb
 ```
 
 ## Project Structure
-*   `data/`: Historical price and gas data for Aug 5, 2024.
-*   `scripts/risk_model.py`: Core simulation engine with slippage and protocol logic.
-*   `notebooks/`: Data visualization and crash analysis.
-*   `reports/`: Backtest summaries and sweep results CSV.
-*   `tests/`: Unit tests for risk logic.
+
+- `data/`: Supplied hourly price and gas observations.
+- `scripts/risk_model.py`: Heuristic risk-analysis model.
+- `notebooks/`: Visual exploration and scenario analysis.
+- `reports/`: Existing analysis outputs; interpret them alongside the assumptions and limitations above.
+- `tests/`: Checks for the model logic.
+- `web-showcase/`: Independent portfolio presentation.
+
+## Portfolio Takeaways
+This case study demonstrates trend analysis, recommendation synthesis, controls thinking, reproducibility, and clear communication of assumptions and limitations. The central recommendation is to treat buffer selection as a documented decision process: monitor trend and execution conditions, compare scenarios, record assumptions, and escalate when observed conditions exceed the model's scope.
