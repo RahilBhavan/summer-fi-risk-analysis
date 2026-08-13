@@ -14,8 +14,23 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Summer.fi | Risk Analysis",
-  description: "An editorial deep-dive into the August 5, 2024 'Black Monday' crash.",
+  title: "Finance Risk Study | DeFi Stress Analysis",
+  description: "An interactive portfolio case study exploring DeFi market stress, liquidation risk, and decision-support analysis.",
+  keywords: ["DeFi risk analysis", "financial data analysis", "market stress simulation", "liquidation risk"],
+  robots: {
+    index: true,
+    follow: true,
+  },
+  openGraph: {
+    title: "Finance Risk Study | DeFi Stress Analysis",
+    description: "An interactive portfolio case study exploring DeFi market stress, liquidation risk, and decision-support analysis.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Finance Risk Study | DeFi Stress Analysis",
+    description: "An interactive portfolio case study exploring DeFi market stress, liquidation risk, and decision-support analysis.",
+  },
 };
 
 export default function RootLayout({

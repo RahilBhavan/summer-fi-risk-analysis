@@ -1,57 +1,48 @@
-# Consulting Case Study: Summer.fi Risk Analysis
+# DeFi Risk Analysis: Executive Case Study
+**Independent portfolio memo**
 
 ## Project Metadata
-*   **Client:** Summer.fi Strategy & Risk Team
-*   **Consultant:** Risk Engineering Specialist
-*   **Period:** March 2026
-*   **Focus:** Automation Resilience & Liquidation Prevention
-*   **Context:** Post-Mortem Analysis of August 5, 2024 ("Black Monday")
-
----
+- **Workstream:** Automated risk-control decision support
+- **Period:** March 2026
+- **Focus:** Trend analysis, scenario comparison, recommendation synthesis, and controls
+- **Context:** August 5, 2024 Ethereum market stress
 
 ## 1. Executive Summary
-This consulting project provides a rigorous, data-driven stress test of Summer.fi's automated safety features (Stop-Loss and Auto-Buy/Sell). By reconstructing the extreme market conditions of the August 5th ETH flash crash, we identified critical failure points in standard static automation triggers and proposed a "Dynamic, Gas-Aware" strategy that significantly improves capital preservation.
+This case study evaluates how risk controls may behave when a sharp price move coincides with elevated network costs. Using 24 hourly observations, the analysis frames a practical decision: how should a reviewer compare stop-loss buffers and escalation rules while keeping assumptions, uncertainty, and model limitations visible?
 
----
+The observed price path moves from 2,910 to a 2,120 trough and finishes at 2,450. That is approximately a 27.1% intraday decline to the trough and a 15.8% decline at close from the start. Peak observed gas is 681.4 Gwei. A static, heuristic comparison of Aave V3 and Morpho lending-market scenarios supports documented monitoring and review rather than a claim of guaranteed execution or capital preservation.
 
-## 2. The Challenge (The "Why")
-DeFi automation is designed to protect users from liquidations. However, on August 5th, Ethereum’s price dropped **22% in hours**, while network gas prices spiked to **710 Gwei**. 
+## 2. The Challenge
+A price-only control can be difficult to interpret during a fast market move. Price gaps, higher execution costs, and uncertain liquidity can change the practical meaning of a nominal buffer. Stakeholders therefore need a repeatable way to distinguish:
 
-**The Problem:** Most automation triggers rely on static LTV thresholds. During high-velocity crashes:
-1.  **Price Gaps:** Prices "jump" over a user's Stop-Loss trigger, landing directly into the liquidation zone.
-2.  **Execution Lag:** High gas prices delay transaction confirmation, allowing the market to move against the user before the trade completes.
-3.  **Liquidity Thinning:** Slippage increases as volatility rises, further eroding the collateral value.
+1. Observed market and network trends.
+2. Assumptions introduced by the model.
+3. Indicative scenario results.
+4. Actions, escalation thresholds, and unanswered questions.
 
----
+## 3. Methodology
+The workstream uses static analysis and a combined Aave V3/Morpho parameter sweep.
 
-## 3. Methodology (The "How")
-We developed a **Gauntlet-style simulation engine** (`scripts/risk_model.py`) to model these dynamics.
+### A. Evidence and Inputs
+- 24 hourly price and gas observations from the supplied scenario.
+- Price anchors of 2,910 start, 2,120 trough, and 2,450 close.
+- Peak observed gas of 681.4 Gwei.
+- Explicit assumptions for collateral, debt, LTV, buffer, gas cost, and slippage.
 
-### A. Data Sources
-*   **1-Minute Price Data:** High-resolution ETH/USD price action from August 5, 2024.
-*   **Real-time Gas Data:** Etherscan hourly gas price spikes for the same window.
+### B. Scenario Logic
+The heuristic model compares indicative outcomes across buffer and lending-market assumptions. It is designed for trend analysis and decision support, not live execution, forecasting, or protocol certification.
 
-### B. Simulation Logic
-The engine tracks a vault's "Effective LTV" through every hour of the crash, accounting for:
-*   **Protocol Parameters:** Aave V3 (82.5% LT, 5% Penalty) and Morpho Blue (94.5% LLTV, 1% Penalty).
-*   **Network Friction:** Modeling slippage and gas costs as a function of market volatility.
+### C. Controls and Reproducibility
+Inputs and assumptions should be recorded with each run. A reviewer should be able to trace a recommendation to the observed trend, parameter choice, model output, and limitation. Results should be treated as a controlled discussion aid and independently challenged before being used for a financial or operational decision.
 
----
+## 4. Recommendation Synthesis
+- Use wider or more conservative review buffers when observed price velocity and network costs exceed ordinary conditions.
+- Pair a numerical trigger with monitoring of trend, execution cost, and liquidity assumptions.
+- Record the rationale for each parameter choice and define an escalation path when conditions exceed the model's scope.
+- Communicate confidence carefully: observed facts, heuristic outputs, and judgment calls should remain distinct.
 
-## 4. Key Findings
-*   **The "Dead Zone":** Static buffers of <5% were universally ineffective for positions with initial LTVs >0.70.
-*   **The Gas Paradox:** Positions that triggered late (due to narrow buffers) faced 10x higher execution costs and 3% higher slippage.
-*   **Capital Saved:** Our proposed **Dynamic Strategy** (lowering the trigger LTV when gas >150 Gwei) successfully preserved **98% of user equity** in scenarios where static triggers resulted in total liquidation.
-
----
-
-## 5. Implementation Roadmap (The "Where")
-The findings from this analysis are being integrated into the Summer.fi automation suite:
-1.  **Phase 1:** Update UI to recommend "Volatility-Adjusted" buffers for high-LTV positions.
-2.  **Phase 2:** Integrate real-time gas price monitoring into the trigger logic (Dynamic Gas Scaling).
-3.  **Phase 3:** Deploy "Flash Liquidity" routing to minimize slippage during peak volatility windows.
-
----
+## 5. Limitations
+The model is illustrative and heuristic. It uses hourly observations, does not reproduce live transaction execution, and does not represent an organizational engagement or production relationship. Aave V3 and Morpho are lending-market scenarios. The analysis does not replace current protocol parameters, live market data, transaction-level testing, liquidity analysis, or independent review.
 
 ## 6. Conclusion
-By transforming risk management from a theoretical exercise into an empirical engineering standard, Summer.fi can ensure its users remain protected even during the most volatile days in crypto history.
+The value of this exercise is its decision process: make assumptions explicit, compare scenarios consistently, preserve a reproducible record, synthesize recommendations, and communicate limitations plainly. That approach provides a stronger basis for stakeholder review than unsupported precision or claims of operational readiness.

@@ -1,46 +1,27 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DeFi Risk Analysis Portfolio Showcase
 
-## Getting Started
+This directory contains the independent portfolio presentation for the DeFi risk-analysis case study. It communicates the scenario, trend analysis, controls, recommendation synthesis, assumptions, and limitations through a Next.js interface. It is a standalone portfolio artifact.
 
-First, run the development server:
+## Setup
+
+From this directory, install dependencies and run the available checks:
 
 ```bash
+npm ci
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run lint
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) after starting the development server. The production build can be served with `npm run start` after `npm run build`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Notes
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- The showcase presents the 24-observation scenario and the documented price and gas facts.
+- Aave V3 and Morpho appear as illustrative lending-market scenarios.
+- The underlying model is static, heuristic, and intended for decision support.
+- Assumptions, controls, reproducibility, stakeholder communication, and limitations are part of the case study rather than claims of live execution capability.
 
-## Learn More
+## Independent Publishing
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-**From this repo (monorepo):** Deploy the `web-showcase` app only.
-
-1. **CLI (from this directory):**
-   ```bash
-   npx vercel login   # once, to link your account
-   cd web-showcase
-   npx vercel         # preview
-   npx vercel --prod  # production
-   ```
-
-2. **Vercel Dashboard:** [Import from Git](https://vercel.com/new). Set **Root Directory** to `web-showcase` so Vercel builds this Next.js app.
-
-The app is optimized for Vercel (Next.js 16, `next/font`, security headers, production build settings).
+The app can be published as an independent Next.js portfolio site using a platform that supports the repository's `web-showcase` directory as its project root. Set the project root to this directory, install with `npm ci`, and use the standard build command `npm run build`. No application-code integration or external service claim is implied by this documentation.
