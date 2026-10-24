@@ -1,20 +1,36 @@
 name: CI
-
 on:
   push:
     branches: [main]
   pull_request:
-
 permissions:
   contents: read
-
 jobs:
-  tests:
+  python:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-      - run: pip install pandas numpy matplotlib pytest
-      - run: python -m pytest -q tests
+          python-version: "3.14"
+      - run: pip install -r requirements.txt
+      - run: python -m pytest tests
+      - name: Sweep reproduces the committed results
+        run: |
+          python scripts/risk_model.py --combined-sweep
+          git diff --exit-code reports/sweep_results.csv
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web-showcase
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web-showcase/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
