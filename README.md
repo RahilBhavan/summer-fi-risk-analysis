@@ -1,59 +1,75 @@
-# DeFi Risk Analysis: Stress-Test Decision Support
+# DeFi risk analysis: a static stop-loss stress test on one day of hourly ETH data
 
-## Project Overview
-This independent portfolio case study examines how automated risk controls can behave during a sharp Ethereum market move. It uses a compact, reproducible scenario to translate price and network conditions into decision support for buffer selection, escalation, and stakeholder communication.
+![The scenario simulator on the live showcase: ETH price, gas and LTV over 24 hours, with the liquidation and protection thresholds. Aave V3 at 70% entry LTV and a 5% buffer is liquidated at 04:00 UTC.](docs/simulator.png)
 
-The analysis compares lending-market scenarios associated with **Aave V3** and **Morpho**. These are illustrative scenarios, not claims about live protocol use or organizational work.
+**Live:** [summer-fi-risk-analysis.vercel.app](https://summer-fi-risk-analysis.vercel.app)
 
-## Case Study: August 5, 2024 Market Stress
-The model uses **24 hourly observations**:
+This is an independent portfolio case study. A small Python model replays 24 hourly ETH price and gas observations for 5 August 2024 against static stop-loss buffers. It uses illustrative Aave V3 and Morpho parameters. A Next.js page lets a reader change the market, entry LTV and buffer and see the outcome. The repository is not affiliated with Summer.fi, Aave or Morpho.
 
-- **ETH price:** 2,910 at the start, 2,120 at the trough (approximately a **27.1% intraday decline**), and 2,450 at the close (approximately a **15.8% close decline** from the start).
-- **Network conditions:** Peak observed gas was **681.4 Gwei**.
-- **Decision question:** How should a risk team evaluate stop-loss buffers when price movement, execution cost, and protocol assumptions interact?
+## Results
 
-## Methodology: Illustrative Heuristic Model
-The workstream simplifies the problem to static analysis and a combined Aave V3/Morpho parameter sweep:
+All numbers come from `data/aug_5_crash_data.csv` and `reports/sweep_results.csv`.
 
-1. Inspect the supplied hourly price and gas observations.
-2. Apply explicit assumptions for collateral, debt, loan-to-value thresholds, buffer levels, execution cost, and slippage.
-3. Compare indicative outcomes across lending-market scenarios and buffer choices.
-4. Synthesize recommendations, controls, trade-offs, and follow-up questions.
+- **Scenario.** ETH goes from 2,910 at 00:00 to a 2,120 low at 06:00 and closes at 2,450 (-27.1% to the low, -15.8% at the close). Peak gas is 681.4 Gwei at 08:00.
+- **Sweep.** 50 static runs: 2 protocols x 5 entry LTVs (0.60 to 0.80) x 5 buffers (2% to 12%).
+- **Aave V3 parameters.** 21 runs end in a stop-loss exit and 4 in liquidation.
+- **Morpho parameters.** 12 runs end in a stop-loss exit, 6 in liquidation and 7 stay active.
+- **Reading the result.** A wider buffer turns a liquidation into a stop-loss exit at the same entry LTV. The sweep shows this only for this one day of data.
 
-The model is **illustrative and heuristic**. It is not a forecast, a valuation, a liquidation simulator for live markets, or evidence of protocol performance. Results depend on the assumptions and should be independently reviewed before use.
+## How it works
 
-## How to Run
+`scripts/risk_model.py` holds a `DeFiRiskModel`. At each hourly row it computes LTV as `debt / (collateral x price)`. It checks the liquidation threshold first, then the stop-loss trigger (threshold minus buffer). Gas does not change LTV. It adds slippage (`0.1% + gas/100 x 0.5%`, capped at 5%) and a fixed 300,000-gas cost to the modeled exit value. Only a static strategy exists. `web-showcase/src/app/riskModel.ts` mirrors the model for the interactive page. `notebooks/aug5_analysis.ipynb` plots the data and the sweep.
 
-### Prerequisites
-Use Python 3.10+ and install the dependencies listed in `requirements.txt`:
+## Run it
+
+Needs Python 3.14 (the version tested; `pandas==3.1.0` needs 3.11 or newer) and, for the showcase, Node 22. No network or keys are needed after install.
 
 ```bash
+python3 -m venv .venv && . .venv/bin/activate
 pip install -r requirements.txt
+python -m pytest tests                      # 11 tests passed on 2026-10-24
+python scripts/risk_model.py --combined-sweep   # rewrites reports/sweep_results.csv (identical to the committed file)
+python scripts/risk_model.py --protocol AaveV3 --ltv 0.70 --buffer 0.05
+jupyter nbconvert --to notebook --execute notebooks/aug5_analysis.ipynb --stdout > /dev/null
 ```
-
-### Model Workstream
-Run the risk-model script according to its available command-line options. The intended analysis is a static review with a combined Aave V3/Morpho sweep; inspect the script help for the current interface before running it:
 
 ```bash
-python3 scripts/risk_model.py --combined-sweep
-python3 scripts/risk_model.py --protocol AaveV3 --ltv 0.70 --buffer 0.05
-python3 -m pytest tests
+cd web-showcase
+npm ci
+npm run lint && npm run build
+npm run dev
 ```
 
-The notebook provides supplementary visual analysis:
+## Repository layout
 
-```bash
-jupyter notebook notebooks/aug5_analysis.ipynb
-```
+- `data/`: the 24-row hourly price and gas CSV.
+- `scripts/`: the Python risk model and command-line entry point.
+- `tests/`: 11 pytest tests of the model.
+- `notebooks/`: plots of the data and the sweep.
+- `reports/`: the sweep CSV and a written backtest report.
+- `web-showcase/`: the Next.js case-study page and docs viewer.
 
-## Project Structure
+## Documentation
 
-- `data/`: Supplied hourly price and gas observations.
-- `scripts/risk_model.py`: Heuristic risk-analysis model.
-- `notebooks/`: Visual exploration and scenario analysis.
-- `reports/`: Existing analysis outputs; interpret them alongside the assumptions and limitations above.
-- `tests/`: Checks for the model logic.
-- `web-showcase/`: Independent portfolio presentation.
+- [`reports/backtest_report_aug5.md`](reports/backtest_report_aug5.md): assumptions, sweep counts and limits.
+- [`CONSULTING_REPORT.md`](CONSULTING_REPORT.md): the case-study write-up and recommendation.
+- [`PROJECT_OVERSIGHT.md`](PROJECT_OVERSIGHT.md): scope notes for the workstream.
 
-## Portfolio Takeaways
-This case study demonstrates trend analysis, recommendation synthesis, controls thinking, reproducibility, and clear communication of assumptions and limitations. The central recommendation is to treat buffer selection as a documented decision process: monitor trend and execution conditions, compare scenarios, record assumptions, and escalate when observed conditions exceed the model's scope.
+## Sources
+
+The CSV is described as a "supplied scenario". Its source is not recorded in this repository, and I have not checked it against on-chain or exchange data. Treat the prices and gas values as illustrative inputs, not as a market record.
+
+## Scope and limits
+
+- Illustrative heuristic model. It is not a forecast, a valuation, or a liquidation simulator for live markets.
+- One day, 24 hourly rows, one collateral asset. Hourly data cannot show whether a stop-loss would have executed before a breach within the hour, so liquidation is checked first.
+- Protocol thresholds (0.825 for Aave V3, 0.945 for Morpho) and penalties (5% and 1%) are fixed parameters, not read from the live protocols. Check them before relying on any result.
+- The web model is a separate TypeScript port. No test compares it with the Python model.
+- The notebook runs, but its output is not committed.
+- Not verified: the data source, the parameter values against current protocol configuration, and the pages at `/docs`.
+
+## License
+
+No license file yet.
+
+Part of [Rahil Bhavan's projects](https://github.com/RahilBhavan).
