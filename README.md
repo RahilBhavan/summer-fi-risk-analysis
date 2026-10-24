@@ -1,5 +1,7 @@
 # DeFi risk analysis: a static stop-loss stress test on one day of hourly ETH data
 
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 ![The scenario simulator on the live showcase: ETH price, gas and LTV over 24 hours, with the liquidation and protection thresholds. Aave V3 at 70% entry LTV and a 5% buffer is liquidated at 04:00 UTC.](docs/simulator.png)
 
 **Live:** [summer-fi-risk-analysis.vercel.app](https://summer-fi-risk-analysis.vercel.app)
@@ -18,16 +20,16 @@ All numbers come from `data/aug_5_crash_data.csv` and `reports/sweep_results.csv
 
 ## How it works
 
-`scripts/risk_model.py` holds a `DeFiRiskModel`. At each hourly row it computes LTV as `debt / (collateral x price)`. It checks the liquidation threshold first, then the stop-loss trigger (threshold minus buffer). Gas does not change LTV. It adds slippage (`0.1% + gas/100 x 0.5%`, capped at 5%) and a fixed 300,000-gas cost to the modeled exit value. Only a static strategy exists. `web-showcase/src/app/riskModel.ts` mirrors the model for the interactive page. `notebooks/aug5_analysis.ipynb` plots the data and the sweep.
+`scripts/risk_model.py` holds a `DeFiRiskModel`. At each hourly row it computes LTV as `debt / (collateral x price)`. It checks the liquidation threshold first, then the stop-loss trigger (threshold minus buffer). Gas does not change LTV. It adds slippage (`0.1% + gas/100 x 0.5%`, capped at 5%) and a fixed 300,000-gas cost to the modeled exit value. Only a static strategy exists. `web-showcase/src/app/riskModel.ts` mirrors the model for the interactive page, and `tests/test_ts_parity.py` checks that both give the same status, trigger hour and exit values. `notebooks/aug5_analysis.ipynb` plots the data and the sweep, with its executed output committed.
 
 ## Run it
 
-Needs Python 3.14 (the version tested; `pandas==3.1.0` needs 3.11 or newer) and, for the showcase, Node 22. No network or keys are needed after install.
+Needs Python 3.14 (the version tested; `pandas==3.1.0` needs 3.11 or newer) and Node 22.18 or newer (the parity test runs the TypeScript model with Node's built-in type stripping). No network or keys are needed after install.
 
 ```bash
 python3 -m venv .venv && . .venv/bin/activate
 pip install -r requirements.txt
-python -m pytest tests                      # 11 tests passed on 2026-10-24
+python -m pytest tests                      # 13 tests passed on 2026-10-24
 python scripts/risk_model.py --combined-sweep   # rewrites reports/sweep_results.csv (identical to the committed file)
 python scripts/risk_model.py --protocol AaveV3 --ltv 0.70 --buffer 0.05
 jupyter nbconvert --to notebook --execute notebooks/aug5_analysis.ipynb --stdout > /dev/null
@@ -43,8 +45,8 @@ npm run dev
 ## Repository layout
 
 - `data/`: the 24-row hourly price and gas CSV.
-- `scripts/`: the Python risk model and command-line entry point.
-- `tests/`: 11 pytest tests of the model.
+- `scripts/`: the Python risk model and command-line entry point, plus the Node helper the parity test calls.
+- `tests/`: 13 pytest tests: the Python model, and its agreement with the TypeScript model.
 - `notebooks/`: plots of the data and the sweep.
 - `reports/`: the sweep CSV and a written backtest report.
 - `web-showcase/`: the Next.js case-study page and docs viewer.
@@ -64,12 +66,12 @@ The CSV is described as a "supplied scenario". Its source is not recorded in thi
 - Illustrative heuristic model. It is not a forecast, a valuation, or a liquidation simulator for live markets.
 - One day, 24 hourly rows, one collateral asset. Hourly data cannot show whether a stop-loss would have executed before a breach within the hour, so liquidation is checked first.
 - Protocol thresholds (0.825 for Aave V3, 0.945 for Morpho) and penalties (5% and 1%) are fixed parameters, not read from the live protocols. Check them before relying on any result.
-- The web model is a separate TypeScript port. No test compares it with the Python model.
-- The notebook runs, but its output is not committed.
+- The web model is a separate TypeScript port. `tests/test_ts_parity.py` compares it with the Python model on the 50-run sweep grid and four off-grid inputs. It does not prove the two agree on every input.
+- The notebook's committed output (three charts) was executed on 2026-10-24 with the pinned requirements. It is not re-run in CI.
 - Not verified: the data source, the parameter values against current protocol configuration, and the pages at `/docs`.
 
 ## License
 
-No license file yet.
+MIT, see [LICENSE](LICENSE). It covers this project's code, not the supplied scenario data, whose source is uncited.
 
 Part of [Rahil Bhavan's projects](https://github.com/RahilBhavan).
